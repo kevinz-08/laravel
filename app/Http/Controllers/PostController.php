@@ -5,10 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Traits\ApiResponse;
-
 //TODO: Eliminar
 use Illuminate\Support\Facades\DB;
-
 
 class PostController extends Controller
 {
@@ -18,8 +16,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        // La mala practica porque tenemos un Model
-        // return response()->json(DB::table('posts')->get());
+        // La mala practica porque tenemos un Model.
+        //return response()->json(DB::table("posts")->get());
         return $this->ok("Todo ok, como dijo el Pibe", Post::get());
     }
 
@@ -28,8 +26,12 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        $newPost = new Post();
-        $newPost->fill($request->only(["" , ""]));
+        //$newPost = Post::create($request->only(['title','content', 'status']));
+        $newPost = Post::updateOrCreate(
+            ['title' => $request->title], //la columnas a comparar para la validacion
+            $request->only(['title','content', 'status'] // Columnas a registrar o actualizar
+        ));
+        return $this->ok("Todo melo mor", [$newPost]);
     }
 
     /**
@@ -37,12 +39,13 @@ class PostController extends Controller
      */
     public function show(string $id)
     {
+        //$result = Post::findOrFail($id);
         $result = Post::find($id);
-        if ($result) {
+        if($result) {
             return $this->ok("Todo ok, como dijo el Pibe", $result);
         } else {
             return $this->success("Todo mal, como NO dijo el Pibe", [], 404);
-    }
+        }
     }
 
     /**
@@ -60,4 +63,4 @@ class PostController extends Controller
     {
         //
     }
-} 
+}
